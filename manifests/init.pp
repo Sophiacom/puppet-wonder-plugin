@@ -3,6 +3,8 @@ class wonder (
 	$userid = 2000,
 	$groupname = 'wouser',
 	$groupid = 2000,
+	$os = 'ubuntu',
+    $osrelease = 'trusty'
 	) {
 
 	group { $groupname:
@@ -34,12 +36,12 @@ class wonder (
 
 	apt::source { 'wocommunity':
 		comment           => 'WOCommunity apt mirror',
-		location          => 'http://packages.wocommunity.org/ubuntu',
-		release           => 'trusty',
+		location          => "http://packages.wocommunity.org/${os}",
+		release           => "${osrelease}",
 		repos             => 'main',
 		include_deb       => true,
 		key               => '1D2A5E5AA13158380229B94925C7D0023AAD08A4',
-		key_source        => 'http://packages.wocommunity.org/ubuntu/signature.gpg',
+		key_source        => "http://packages.wocommunity.org/${os}/signature.gpg",
 		require           => File['/etc/apt/apt.conf.d/99auth'],
 	}
 
@@ -70,7 +72,7 @@ WEBOBJECTS_URL=
 		require => Package['httpd']
 	}
 
-	package { 'webobjects': 
+	package { 'webobjects':
 		ensure  => present,
 		responsefile => '/var/cache/debconf/webobjects.preseed',
 		require => [File['/var/cache/debconf/webobjects.preseed'], File['/etc/default/webobjects'], Apt::Source['wocommunity']],
