@@ -1,13 +1,7 @@
-define wonder::application ($appname = $title, $binaryRelativePath = undef, $username = $wonder::username) {
-	if $binaryRelativePath == undef  {
-		$_binaryRelativePath = "${appname}.woa"
-	} else {
-		$_binaryRelativePath = $binaryRelativePath
-	}
-
+define wonder::application ($appname = $title, $binaryRelativePath = "${title}.woa", $username = $wonder::username) {
 	exec { "add application ${appname}":
 		require => Exec['wait for monitor'],
-		command => "/usr/bin/curl -X POST -d \"{id: '${appname}',type: 'MApplication', name: '${appname}', unixOutputPath: '/home/${username}/logs', unixPath: '/home/${username}/apps/${_binaryRelativePath}', autoRecover: false}\" http://localhost:1086/cgi-bin/WebObjects/JavaMonitor.woa/ra/mApplications.json"
+		command => "/usr/bin/curl -X POST -d \"{id: '${appname}',type: 'MApplication', name: '${appname}', unixOutputPath: '/home/${username}/logs', unixPath: '/home/${username}/apps/${binaryRelativePath}', autoRecover: false}\" http://localhost:1086/cgi-bin/WebObjects/JavaMonitor.woa/ra/mApplications.json"
 	}
 
 	exec { "add application instance 1 ${appname}":
