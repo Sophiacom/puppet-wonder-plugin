@@ -78,9 +78,19 @@ WEBOBJECTS_URL=
 		require => [File['/var/cache/debconf/webobjects.preseed'], File['/etc/default/webobjects'], Apt::Source['wocommunity']],
 	}
 
-	package { 'libapache2-mod-wo':
+	file { '/usr/lib/apache2/modules/mod_WebObjects.so':
+		ensure  => present,
+		source => 'puppet:///modules/wonder/mod_WebObjects.so',
+	}
+
+	file { '/etc/apache2/mods-available/webobjects.load':
 		ensure => present,
-		require => [Package['webobjects'], Package['httpd'], File['/etc/apache2/mods-available/webobjects.conf']],
+		content => 'LoadModule WebObjects_module /usr/lib/apache2/modules/mod_WebObjects.so',
+	}
+
+	exec { 'enable mod_WebObjects':
+		command => '/usr/sbin/a2enmod webobjects',
+		require => [Package['webobjects'], Package['httpd'], File['/etc/apache2/mods-available/webobjects.conf'], File['/etc/apache2/mods-available/webobjects.load'], File['/usr/lib/apache2/modules/mod_WebObjects.so']],
 		notify => Service['httpd'],
 	}
 
@@ -108,5 +118,4 @@ WEBOBJECTS_URL=
 		require => Exec['wait for monitor'],
 		command => "/usr/bin/curl -X PUT -d \"{woAdaptor:'http://localhost:8080/cgi-bin/WebObjects'}\" http://localhost:1086/cgi-bin/WebObjects/JavaMonitor.woa/ra/mSiteConfig.json"
 	}
-
 }
